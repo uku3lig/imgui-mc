@@ -6,14 +6,18 @@ import imgui.flag.ImGuiConfigFlags;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.glfw.ImGuiImplGlfw;
 import net.minecraft.client.MinecraftClient;
-import xyz.breadloaf.imguimc.Imguimc;
 import xyz.breadloaf.imguimc.interfaces.Renderable;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.lwjgl.glfw.GLFW.*;
 
 public class ImguiLoader {
-    private static final ImGuiImplGlfw imGuiGlfw = new ImGuiImplGlfw();
+    private static final Set<Renderable> renderstack = new HashSet<>();
+    private static final Set<Renderable> toRemove = new HashSet<>();
 
+    private static final ImGuiImplGlfw imGuiGlfw = new ImGuiImplGlfw();
     private static final ImGuiImplGl3 imGuiGl3 = new ImGuiImplGl3();
 
     public static void onGlfwInit(long handle) {
@@ -28,7 +32,7 @@ public class ImguiLoader {
 
         //user render code
 
-        for (Renderable renderable: Imguimc.renderstack) {
+        for (Renderable renderable: renderstack) {
             MinecraftClient.getInstance().getProfiler().push("ImGui Render/"+renderable.getName());
             renderable.getTheme().preRender();
             renderable.render();
@@ -83,6 +87,19 @@ public class ImguiLoader {
             ImGui.renderPlatformWindowsDefault();
             glfwMakeContextCurrent(backupWindowPtr);
         }
+
+        if (!toRemove.isEmpty()) {
+            toRemove.forEach(renderstack::remove);
+            toRemove.clear();
+        }
+    }
+
+    public static void addRenderable(Renderable renderable) {
+        renderstack.add(renderable);
+    }
+
+    public static void queueRemove(Renderable renderable) {
+        toRemove.add(renderable);
     }
 
     private ImguiLoader() {}
