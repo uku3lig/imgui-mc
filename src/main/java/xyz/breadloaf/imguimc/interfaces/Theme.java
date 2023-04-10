@@ -1,6 +1,11 @@
 package xyz.breadloaf.imguimc.interfaces;
 
 public interface Theme {
-    void preRender();
-    void postRender();
+    default void preRender() {
+        // do nothing
+    }
+
+    default void postRender() {
+        // do nothing
+    }
 }
