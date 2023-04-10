@@ -60,7 +60,7 @@ jar {
 
 shadowJar {
     configurations = [project.configurations.shadow]
-    classifier 'shadow-dev'
+    // classifier 'shadow-dev'
     dependencies {
         exclude(dependency('org.lwjgl:lwjgl'))
         exclude(dependency('org.lwjgl:lwjgl-glfw'))
