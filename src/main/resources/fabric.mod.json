@@ -8,17 +8,10 @@
   "contact": {},
   "license": "MIT",
   "environment": "client",
-  "entrypoints": {
-    "client": [
-      "xyz.breadloaf.imguimc.Imguimc"
-    ]
-  },
   "mixins": [
     "imguimc.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.11.6",
-    "fabric": "*",
-    "minecraft": "1.17.1"
+    "fabricloader": ">=0.13"
   }
 }

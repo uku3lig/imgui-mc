@@ -5,6 +5,7 @@ import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiConfigFlags;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.glfw.ImGuiImplGlfw;
+import net.minecraft.client.MinecraftClient;
 import xyz.breadloaf.imguimc.Imguimc;
 import xyz.breadloaf.imguimc.interfaces.Renderable;
 
@@ -15,13 +16,10 @@ public class ImguiLoader {
 
     private static final ImGuiImplGl3 imGuiGl3 = new ImGuiImplGl3();
 
-    private static long windowHandle;
-
     public static void onGlfwInit(long handle) {
-        initializeImGui(handle);
+        initializeImGui();
         imGuiGlfw.init(handle,true);
         imGuiGl3.init();
-        windowHandle = handle;
     }
 
     public static void onFrameRender() {
@@ -31,20 +29,20 @@ public class ImguiLoader {
         //user render code
 
         for (Renderable renderable: Imguimc.renderstack) {
-            Imguimc.MINECRAFT.getProfiler().push("ImGui Render/"+renderable.getName());
+            MinecraftClient.getInstance().getProfiler().push("ImGui Render/"+renderable.getName());
             renderable.getTheme().preRender();
             renderable.render();
             renderable.getTheme().postRender();
-            Imguimc.MINECRAFT.getProfiler().pop();
+            MinecraftClient.getInstance().getProfiler().pop();
         }
 
         //end of user code
 
         ImGui.render();
-        endFrame(windowHandle);
+        endFrame();
     }
 
-    private static void initializeImGui(long glHandle) {
+    private static void initializeImGui() {
         ImGui.createContext();
 
         final ImGuiIO io = ImGui.getIO();
@@ -74,7 +72,7 @@ public class ImguiLoader {
         }
     }
 
-    private static void endFrame(long windowPtr) {
+    private static void endFrame() {
         // After Dear ImGui prepared a draw data, we use it in the LWJGL3 renderer.
         // At that moment ImGui will be rendered to the current OpenGL context.
         imGuiGl3.renderDrawData(ImGui.getDrawData());
@@ -85,8 +83,7 @@ public class ImguiLoader {
             ImGui.renderPlatformWindowsDefault();
             glfwMakeContextCurrent(backupWindowPtr);
         }
-
-        //glfwSwapBuffers(windowPtr);
-        //glfwPollEvents();
     }
+
+    private ImguiLoader() {}
 }

@@ -1,34 +1,24 @@
 plugins {
-    id "fabric-loom" version "0.8-SNAPSHOT"
+    id "fabric-loom" version "1.1-SNAPSHOT"
     id "com.github.johnrengelman.shadow" version "7.0.0"
+    id "maven-publish"
 }
 
-apply plugin: 'maven-publish'
-
-sourceCompatibility = JavaVersion.VERSION_16
-targetCompatibility = JavaVersion.VERSION_16
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 archivesBaseName = project.archives_base_name
-version = project.mod_version
+version = "${project.mod_version}+${project.minecraft_version}"
 group = project.maven_group
 
 repositories {
-    mavenLocal()
     mavenCentral()
-
-    maven { url = "https://maven.fabricmc.net/" }
-
-}
-
-runClient.doFirst {
-    args = ['--username', "breadloaf${new Random().nextInt(1000)}"]
 }
 
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings minecraft.officialMojangMappings()
+    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
     implementation 'com.google.code.findbugs:jsr305:3.0.2'
 
@@ -45,18 +35,17 @@ dependencies {
     shadow "io.github.spair:imgui-java-natives-macos:${project.imguiVersion}"
 }
 
-processResources {
+tasks.processResources {
+    inputs.property("version", project.version)
+    filteringCharset = "UTF-8"
+
     filesMatching("fabric.mod.json") {
-        expand "version": project.mod_version,
-                "minecraft_dependency": project.minecraft_dependency,
-                "loader_version": project.loader_version,
-                "fabric_version": project.fabric_version
+        expand "version": project.version
     }
 }
 
 tasks.withType(JavaCompile).configureEach {
     it.options.encoding = "UTF-8"
-    it.options.release = 16
 }
 
 java {
@@ -65,7 +54,7 @@ java {
 
 jar {
     from("LICENSE") {
-        rename { "${it}_${project.archivesBaseName}" }
+        rename { "${it}_${project.archives_base_name}" }
     }
 }
 
@@ -81,9 +70,10 @@ shadowJar {
 
 remapJar {
     dependsOn shadowJar
-    input.set shadowJar.archiveFile.get()
+    inputFile.set shadowJar.archiveFile.get()
 }
 
+/*
 publishing {
     publications {
         mavenJava(MavenPublication) {
@@ -107,3 +97,5 @@ publishing {
 
     }
 }
+
+ */
