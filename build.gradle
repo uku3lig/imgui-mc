@@ -8,7 +8,7 @@ sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
 
 archivesBaseName = project.archives_base_name
-version = "${project.mod_version}+${project.minecraft_version}"
+version = "${project.mod_version}+${project.minecraft_version}-build.${System.getenv().BUILD_NUMBER ?: "unknown"}"
 group = project.maven_group
 
 repositories {
@@ -71,29 +71,21 @@ remapJar {
     archiveClassifier = null
 }
 
-/*
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifact(jar.archivePath) {
-                builtBy remapJar
-            }
-            artifact(sourcesJar) {
-                 builtBy remapSourcesJar
-            }
+            from components.java
         }
     }
+
     repositories {
         maven {
+            name = "UkuSnapshots"
+            url = "https://maven.uku3lig.net/snapshots"
             credentials {
-                username "$mavenUser"
-                password "$mavenPassword"
+                username = "uku"
+                password = System.getenv("MAVEN_PASSWORD")
             }
-            name = 'breadloaf.public'
-            url = 'https://maven.breadloaf.xyz/repository/public'
         }
-
     }
 }
-
- */
